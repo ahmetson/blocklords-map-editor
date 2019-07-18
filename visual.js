@@ -316,13 +316,14 @@ var drag = d3.behavior.drag()
 	
 		var dragTarget = d3.select(this).select('circle');
 		
-		//console.log(this);
+		// console.log(this);
+		// console.log(dragTarget);
 		
 		var new_cx, new_cy;
 		
-		//console.log(d);
+		// console.log(d);
 		
-			dragTarget
+		dragTarget
 		.attr("cx", function()
 		{
 			new_cx = d3.event.dx + parseInt(dragTarget.attr("cx"));
@@ -333,11 +334,13 @@ var drag = d3.behavior.drag()
 			new_cy = d3.event.dy + parseInt(dragTarget.attr("cy"));
 			return new_cy;
 		});
-		
+				// return;
+
 		d.x = new_cx;
 		d.y = new_cy;
-		//console.log(d.x + " " + d.y);
+		// console.log(d.x + " " + d.y);
 		
+		addNodeToGraph(d);
 		restart();
 	});
 
