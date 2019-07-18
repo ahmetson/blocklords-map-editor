@@ -13,6 +13,10 @@ body {
 	float: left;
 }
 
+.canvas-container {
+	display: none;
+}
+
 body > .container .graph-container {
 	width: 1015px;		/* */
 	height: 561px;		/**/

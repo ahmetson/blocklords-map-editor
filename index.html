@@ -108,6 +108,7 @@
     <!-- /.row -->
 
   </div>
+
   <!-- /.container -->
 
   <!-- Footer -->
@@ -117,6 +118,10 @@
     </div>
     <!-- /.container -->
   </footer>
+
+  <div class="canvas-container" id="canvas-container">
+    <canvas id="regions"></canvas>
+  </div>
 
   <!-- Bootstrap core JavaScript -->
   <script src="vendor/jquery/jquery.min.js"></script>
@@ -130,14 +135,14 @@
 
     function addNodeToGraph(node) {
       graph.setNode(node.id, node);
+    }
 
-      reListVertices();
+    function isNodeOnGraph(node) {
+      return graph.node(node.id) != undefined;
     }
 
     function addEdgeToGraph(source, destination) {
       graph.setEdge(source.id, destination.id);
-
-      reListEdges();
     }
 
     function removeNodeFromGraph(node) {
@@ -175,8 +180,113 @@
 
       verticesList.setAttribute("rows", graph.edges().length)
     }
-
   </script>
+  <script type="text/javascript">
+    /**
+     * Return the location of the element (x,y) being relative to the document.
+     * 
+     * @param {Element} obj Element to be located
+     */
+    function getElementPosition(obj) {
+      var curleft = 0, curtop = 0;
+      if (obj.offsetParent) {
+          do {
+              curleft += obj.offsetLeft;
+              curtop += obj.offsetTop;
+          } while (obj = obj.offsetParent);
+          return { x: curleft, y: curtop };
+      }
+      return undefined;
+    }
+
+    /** 
+       * return the location of the click (or another mouse event) relative to the given element (to increase accuracy).
+       * @param {DOM Object} element A dom element (button,canvas,input etc)
+       * @param {DOM Event} event An event generate by an event listener.
+       */
+    function getEventLocation(element,event){
+        // Relies on the getElementPosition function.
+        var pos = getElementPosition(element);
+            
+        return {
+          x: (event.pageX - pos.x),
+          y: (event.pageY - pos.y)
+        };
+    }
+
+    /**
+      * Draw an image (from your own domain or base64)
+      * @param {String} sourceurl
+    */
+    function drawImageFromWebUrl(sourceurl, canvas){
+          var img = new Image(imgWidth, imgHeight);
+          img.addEventListener("load", function () {
+              // The image can be drawn from any source, the canvas will be filled with the image.
+              canvas.getContext("2d").drawImage(img, 0, 0, img.width,    img.height, 0, 0, canvas.width, canvas.height); 
+          });
+
+          img.setAttribute("src", sourceurl);
+    }
+
+    function rgbToHex(r, g, b) {
+          if (r > 255 || g > 255 || b > 255)
+              throw "Invalid color component";
+          return ((r << 16) | (g << 8) | b).toString(16);
+    }
+
+    function hexToNumlist(hex) {
+          var ints = []; 
+          for (var i=0; i<hex.length/2; i++) { 
+              ints[i] = parseInt(hex.substring(i * 2, i*2+2), 16); 
+          }
+          return ints;
+    }
+  </script>
+  <!-- Functions of game -->
+  <script type="text/javascript">
+        function getColorByCoord(x, y) {
+          var context = regions.getContext('2d');
+            var pixelData = context.getImageData(x, y, 1, 1).data; 
+
+            // If transparency on the pixel , array = [0,0,0,0]
+            if((pixelData[0] == 0) && (pixelData[1] == 0) && (pixelData[2] == 0) && (pixelData[3] == 0)){
+                // Do something if the pixel is transparent
+            }
+
+            // Convert it to HEX if you want using the rgbToHex method.
+            var hex = ("000000" + rgbToHex(pixelData[0], pixelData[1], pixelData[2])).slice(-6);
+            var hashedHex = "#" + hex;
+            console.log("Region is "+hashedHex);
+
+            return hex;
+        }
+    </script>
+  
+    <script>
+        let regionsUrl = "regions.png";
+        let bordersUrl = "borders.png";
+        let imgUrl = "world_back.jpg";
+        let imgWidth = 1015;
+        let imgHeight = 561;
+        var activeRegion = 0;
+        var imgPointSource = null;
+
+        // an array of points that defines the outline path (stroke path)
+        var regions = document.getElementById("regions");
+        regions.setAttribute("width", imgWidth);
+        regions.setAttribute("height", imgHeight);
+
+        drawImageFromWebUrl(regionsUrl, regions);
+  
+        // ------------------------------
+        // Region drawing
+        // ------------------------------
+        window.onload = function(){
+            var container = document.getElementById("canvas-container");
+            container.setAttribute("style", "height: "+imgHeight+"px; width: "+imgWidth+"px;");
+            //container.addEventListener("mousemove", onMap, false);
+        };
+    </script>
   <script src="visual.js"></script>
 </body>
 

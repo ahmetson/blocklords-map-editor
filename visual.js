@@ -8,13 +8,6 @@ var svg = d3.select('.graph-container')
 			.attr('height',height)
 			.attr('style', "background-image:url(regions.png);");
 
-// Node Limit
-var countNodeId = new Array(2000);
-for (var i = countNodeId.length; i >= 0; -- i) countNodeId[i] = 0;
-countNodeId[0]++;
-countNodeId[1]++;
-countNodeId[2]++;
-
 // Init the list of nodes and edges with some nodes?
 // >>>>>>>>>>>>>>>>
 var nodes = [ 	
@@ -25,9 +18,7 @@ var nodes = [
 	links = [	
 			// {source : nodes[0], target : nodes[1], weight : 1},
 			// {source : nodes[1], target : nodes[2], weight : 1 }
-		],
-	// lastNodeId = 3;
-	lastNodeId = 0;
+		];
 
 var drag_line = svg.append('svg:path')
 	.attr('class', 'link dragline hidden')
@@ -267,19 +258,14 @@ function mousedown() {
   if(d3.event.ctrlKey || mousedown_node || mousedown_link) return;
  
   // insert new node at point
-  var point = d3.mouse(this),
-      node = {id: lastNodeId};
-	  
-	// find new last node ID
-  countNodeId[lastNodeId]++;
-  for (var i = 0; i < countNodeId.length; i++)
-	if (countNodeId[i] === 0) 
-	{
-	   lastNodeId = i;
-	   break;
-	}
-  node.x = point[0];
-  node.y = point[1];
+  var point = d3.mouse(this);
+  var node = {id: getColorByCoord(point[0], point[1]), x: point[0], y: point[1]};
+
+  if (isNodeOnGraph(node)) {
+  	console.warn("Region with a color #"+node.id+" on graph already");
+  	return;
+  }
+
   nodes.push(node);
  	
   addNodeToGraph(node);
@@ -380,13 +366,6 @@ function keydown() {
 	  {
         nodes.splice(nodes.indexOf(selected_node), 1);
         spliceLinksForNode(selected_node);
-		countNodeId[selected_node.id] = 0;
-		for (var i = 0; i < countNodeId.length; i++)
-			if (countNodeId[i] === 0) 
-			{
-			   lastNodeId = i;
-			   break;
-			}
       } else if(selected_link) {
         links.splice(links.indexOf(selected_link), 1);
       }
