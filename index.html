@@ -159,7 +159,9 @@
         var id = nodes[i].id;
         var node = nodes[i];
 
-        var vertex = "graph.setNode('"+id+"', "+JSON.stringify(node)+");\n";
+        var nodeToSet = JSON.parse(JSON.stringify(node))
+        nodeToSet.y = imgHeight - node.y;
+        var vertex = "graph.setNode('"+id+"', "+JSON.stringify(nodeToSet)+");\n";
         
         verticesList.innerHTML = verticesList.innerHTML + vertex;
       }
